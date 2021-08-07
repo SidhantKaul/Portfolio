@@ -4,11 +4,14 @@ const app = express();
 const cors = require("cors")
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
+let port = process.env.PORT;
+const path = require("path");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-app.use(cors())
+app.use(cors());
+app.use(express.static(path.join(__dirname, "/client/build")));
 
 app.post("/contact", async function(req,res){
   let testAccount = await nodemailer.createTestAccount();
@@ -36,6 +39,13 @@ transporter.sendMail(options,function(err,info) {
   console.log("UVUYVFUYVFUYVIKV");
   console.log(req.body);
 });
-app.listen(9000,function() {
-  console.log("server started");
-})
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+});
+
+if (port == null || port == "") {
+  port = 9000;
+}
+app.listen(port,function() {
+  console.log("Server has Started");
+});
